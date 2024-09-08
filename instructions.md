@@ -1,59 +1,107 @@
-yo this is my sample haveno build thing
-if you're making your own haveno instance you might wanna edit the relevant files like so:
-TODO: command block of using sed to replace exchange.haveno.Haveno with YOUR_ID_HERE and the `http://localhost:8080` with their url
+# Haveno Sample Build
 
-- move config file
-- complete all todos
-  - [x] make a gpg key with `.gpg` as the home dir and store the b64 in `.flatpakref` (see [gpgkey.sh](./gpgkey.sh) for an example)
-  - [x] enter the key id in config.json lines 8 and 36
-  - [x] generate a secret and enter it on line 38, and generate a token with that secret
-    - the included gentoken project can be used for this:
+This README provides instructions for setting up a Haveno instance using Docker and Flatpak. Follow these steps to configure and run your own Haveno instance.
 
-    ```bash
-    cd gentoken
-    # assuming the secret is stored in PROJ_DIR/secret.txt
-    cargo run -- --base64 --secret-file ../secret.txt --name all > ../token.txt
-    cd -
-    ```
+## Setup Instructions
 
-- `docker compose up -d`
-  - you can run `docker compose up` to run it in your terminal and see logs and C-c it when you want, or you can `docker compose logs -f` if you just want to see the logs
-- once you see "Started http server", init your stable repo (one time thing):
+### Edit Configuration Files
+
+To customize your Haveno instance, you'll need to modify certain files. Here's how:
+
+1. **Update `exchange.haveno.Haveno` and URL:**
+   Replace `exchange.haveno.Haveno` with `YOUR_ID_HERE` and update `http://localhost:8080` with your instance's URL in the relevant files. Use `sed` to automate this process:
+
+   ```bash
+   sed -i 's/exchange.haveno.Haveno/YOUR_ID_HERE/g' path/to/your/file
+   sed -i 's|http://localhost:8080|your-url-here|g' path/to/your/file
+   ```
+
+2. **Move Configuration File:**
+   Make sure to move your configuration file to the appropriate location as required by your setup.
+
+3. **Complete Configuration:**
+   - [x] **Generate a GPG Key:**
+     Create a GPG key with `.gpg` as the home directory and store the base64 encoded key in `.flatpakref`. Refer to the [gpgkey.sh](./gpgkey.sh) script for an example.
+   - [x] **Update `config.json`:**
+     Enter your GPG key ID in `config.json` on lines 8 and 36.
+   - [x] **Generate and Enter Secret:**
+     Generate a secret and enter it on line 38 of `config.json`. Use the `gentoken` project to generate a token:
+
+     ```bash
+     cd gentoken
+     # Assuming the secret is stored in PROJ_DIR/secret.txt
+     cargo run -- --base64 --secret-file ../secret.txt --name all > ../token.txt
+     cd -
+     ```
+
+### Start Services
+
+1. **Bring Up Docker Containers:**
+
+   ```bash
+   docker compose up -d
+   ```
+
+   You can use `docker compose up` to run the containers in the terminal and view logs. Alternatively, use `docker compose logs -f` to follow the logs without starting the containers in the foreground.
+
+2. **Initialize Stable Repository:**
+
+   Once you see "Started http server", initialize your stable repository (one-time setup):
+
+   ```bash
+   # Enter the 'flat-manager' container with an interactive bash shell
+   docker compose exec -it flat-manager bash
+
+   # Update package lists and install 'ostree' inside the container
+   apt update && apt install -y ostree
+
+   # Initialize the 'ostree' repository at the specified path in archive-z2 mode
+   ostree --repo=/var/run/flat-manager/stable-repo init --mode=archive-z2
+
+   # Create a directory '/build-repo' if needed
+   mkdir -p /build-repo
+
+   # Exit the container
+   exit
+   ```
+
+### Build and Publish
+
+1. **Build an App:**
+   Build your application into a temporary repository. For details, refer to the [Flatpak Builder documentation](https://docs.flatpak.org/en/latest/flatpak-builder.html).
+
+2. **Set TOKEN_FILE:**
+   Set `TOKEN_FILE` to the location of the file containing your token (not the secret), which should be `PROJ_DIR/token.txt`.
+
+3. **Publish the Repository:**
+
+   ```bash
+   ./publish.sh <DIR>
+   ```
+
+   - Set `FLATMAN_URL` if you're not using the default localhost URL.
+   - Monitor the logs to ensure everything proceeds smoothly.
+   - If no errors occur, press `y` to confirm and publish the build.
+
+### Testing
+
+To test the installation on your host machine:
 
 ```bash
-# Enter the 'flat-manager' container with an interactive bash shell
-docker compose exec -it flat-manager bash
-
-# Update package lists and install 'ostree' inside the container
-apt update && apt install -y ostree
-
-# Initialize the 'ostree' repository at the specified path in archive-z2 mode
-ostree --repo=/var/run/flat-manager/stable-repo init --mode=archive-z2
-
-# Create a directory '/build-repo' if needed
-mkdir -p /build-repo
-
-# Exit
-exit
+flatpak install --from .flatpakref
+flatpak run exchange.haveno.Haveno
 ```
 
-- build an app into a temp repo (see <https://docs.flatpak.org/en/latest/flatpak-builder.html>)
-- set TOKEN_FILE to location of file containing your **token, not secret**
-  - which should be PROJ_DIR/token.txt
-- use `./publish.sh <DIR>` to publish that repo
-  - set FLATMAN_URL if you're not using the localhost one
-  - keep an eye on the logs to make sure everything goes smoothly
-  - if there aren't any errors, press y to "publish" the build
-- youre done!
+## Notes
 
-to test on your host:
+- **`.flatpakref` File:**
+  Share the `.flatpakref` file to direct users to your app. It acts as a manifest indicating where the app and related data are stored.
 
-- flatpak install --from .flatpakref
-- flatpak run exchange.haveno.Haveno
+- **Updates:**
+  Instruct users to run `flatpak update exchange.haveno.Haveno` to update the app.
 
-notes:
+- **Repository Size:**
+  The build directory may grow large over time. `ostree` manages size to some extent, but doing a `down` and `up` on the container may help clear up space.
 
-- you wanna share the `.flatpakref` if you want to point people to your app, think of it like a manifest file that says where the app and such data is stored
-- tell your users to run `flatpak update exchange.haveno.Haveno` if they wanna update
-- the build-dir theoretically could get large over the course of a few builds, i'm not sure if ostree manages the size, doing a down up on the container should remove it
-- all of the saved config aside from `.gpg` and `config.json` are stored in docker volumes so see the docs if you wanna edit them
+- **Configuration Storage:**
+  All saved configuration, except for `.gpg` and `config.json`, is stored in Docker volumes. Refer to the Docker documentation if you need to edit these volumes.
