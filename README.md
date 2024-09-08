@@ -18,11 +18,11 @@ This README provides instructions for setting up a `flat-manager` server for you
 1. Rename `sample.config.json` to `config.json`
 
 2. Complete the todos in the project:
-   - [x] **Generate a GPG Key:**
+   - [ ] **Generate a GPG Key:**
      Create a GPG key with `./.gpg` as the gpg home directory and store the base64 encoded key in `.flatpakref`. Refer to the [gpgkey.sh](./gpgkey.sh) script for an example.
-   - [x] **Update `config.json`:**
+   - [ ] **Update `config.json`:**
      Enter the new GPG key ID in `config.json` on lines 8 and 36.
-   - [x] **Generate and Enter Secret:**
+   - [ ] **Generate and Enter Secret:**
      Generate a secret and enter it on line 38 of `config.json`. Use the `gentoken` project (taken from the `flat-manager` project) to generate a token:
 
      ```bash
