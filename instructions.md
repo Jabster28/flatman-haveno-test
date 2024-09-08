@@ -1,6 +1,6 @@
 yo this is my sample haveno build thing
-if you're making your own haveno instance please edit the relevant files like so:
-TODO: command block of using sed to replace the app id with YOUR_ID_HERE and the http url with theirs
+if you're making your own haveno instance you might wanna edit the relevant files like so:
+TODO: command block of using sed to replace exchange.haveno.Haveno with YOUR_ID_HERE and the `http://localhost:8080` with their url
 
 - move config file
 - complete all todos
@@ -41,6 +41,7 @@ exit
 - set TOKEN_FILE to location of file containing your **token, not secret**
   - which should be PROJ_DIR/token.txt
 - use `./publish.sh <DIR>` to publish that repo
+  - set FLATMAN_URL if you're not using the localhost one
   - keep an eye on the logs to make sure everything goes smoothly
   - if there aren't any errors, press y to "publish" the build
 - youre done!
