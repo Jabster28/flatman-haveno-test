@@ -105,11 +105,11 @@ fn main() {
     }
 
     if prefixes.is_empty() {
-        prefixes = vec!["".to_string()];
+        prefixes = vec![String::new()];
     }
 
     if repos.is_empty() {
-        repos = vec!["".to_string()];
+        repos = vec![String::new()];
     }
 
     if branches.is_empty() {

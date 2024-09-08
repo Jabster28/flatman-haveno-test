@@ -1,36 +1,36 @@
 # Haveno Sample Build
 
-This README provides instructions for setting up a Haveno instance using Docker and Flatpak. Follow these steps to configure and run your own Haveno instance.
+This README provides instructions for setting up a `flat-manager` server for your Haveno instance Flatpaks using Docker.
 
 ## Setup Instructions
 
 ### Edit Configuration Files
 
-To customize your Haveno instance, you'll need to modify certain files. Here's how:
+> If you're setting up a new Haveno instance, you may want to edit some strings from this example. You can automate this with `sed`:
+>
+> ```bash
+> sed -i 's/exchange.haveno.Haveno/YOUR_ID_HERE/g' path/to/your/file
+> sed -i 's|http://localhost:8080|your-url-here|g' path/to/your/file
+> ```
+>
+> This will also change the string in the README.
 
-1. **Update `exchange.haveno.Haveno` and URL:**
-   Replace `exchange.haveno.Haveno` with `YOUR_ID_HERE` and update `http://localhost:8080` with your instance's URL in the relevant files. Use `sed` to automate this process:
+1. Rename `sample.config.json` to `config.json`
 
-   ```bash
-   sed -i 's/exchange.haveno.Haveno/YOUR_ID_HERE/g' path/to/your/file
-   sed -i 's|http://localhost:8080|your-url-here|g' path/to/your/file
-   ```
-
-2. **Move Configuration File:**
-   Make sure to move your configuration file to the appropriate location as required by your setup.
-
-3. **Complete Configuration:**
+2. Complete the todos in the project:
    - [x] **Generate a GPG Key:**
-     Create a GPG key with `.gpg` as the home directory and store the base64 encoded key in `.flatpakref`. Refer to the [gpgkey.sh](./gpgkey.sh) script for an example.
+     Create a GPG key with `./.gpg` as the gpg home directory and store the base64 encoded key in `.flatpakref`. Refer to the [gpgkey.sh](./gpgkey.sh) script for an example.
    - [x] **Update `config.json`:**
-     Enter your GPG key ID in `config.json` on lines 8 and 36.
+     Enter the new GPG key ID in `config.json` on lines 8 and 36.
    - [x] **Generate and Enter Secret:**
-     Generate a secret and enter it on line 38 of `config.json`. Use the `gentoken` project to generate a token:
+     Generate a secret and enter it on line 38 of `config.json`. Use the `gentoken` project (taken from the `flat-manager` project) to generate a token:
 
      ```bash
      cd gentoken
+
      # Assuming the secret is stored in PROJ_DIR/secret.txt
      cargo run -- --base64 --secret-file ../secret.txt --name all > ../token.txt
+
      cd -
      ```
 
@@ -80,8 +80,10 @@ To customize your Haveno instance, you'll need to modify certain files. Here's h
    ```
 
    - Set `FLATMAN_URL` if you're not using the default localhost URL.
+   > The `sed` commands mentioned earlier does this for you.
    - Monitor the logs to ensure everything proceeds smoothly.
-   - If no errors occur, press `y` to confirm and publish the build.
+   - If no errors occur, press `y` to confirm and publish the build. Reminder that anything that isn't published doesn't appear in users' repositories, and will be lost if the container is removed.
+   - You're done!
 
 ### Testing
 
@@ -101,7 +103,7 @@ flatpak run exchange.haveno.Haveno
   Instruct users to run `flatpak update exchange.haveno.Haveno` to update the app.
 
 - **Repository Size:**
-  The build directory may grow large over time. `ostree` manages size to some extent, but doing a `down` and `up` on the container may help clear up space.
+  The build directory may grow large over time. `ostree` manages size to some extent, but running `docker compose down` and `docker compose up` should clear the cache.
 
 - **Configuration Storage:**
   All saved configuration, except for `.gpg` and `config.json`, is stored in Docker volumes. Refer to the Docker documentation if you need to edit these volumes.
