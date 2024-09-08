@@ -13,7 +13,7 @@ This README provides instructions for setting up a `flat-manager` server for you
 > sed -i 's|http://localhost:8080|your-url-here|g' path/to/your/file
 > ```
 >
-> This will also change the string in the README.
+> This will also change the string in the README. **Ensure that you have changed the ID and the `bind`ed folder in your Haveno builds too, otherwise users won't be able to install your application.**
 
 1. Rename `sample.config.json` to `config.json`
 
