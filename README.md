@@ -9,8 +9,8 @@ This README provides instructions for setting up a `flat-manager` server for you
 > If you're setting up a new Haveno instance, you may want to edit some strings from this example. You can automate this with `sed`:
 >
 > ```bash
-> sed -i 's/exchange.haveno.Haveno/YOUR_ID_HERE/g' path/to/your/file
-> sed -i 's|http://localhost:8080|your-url-here|g' path/to/your/file
+> find . -type f -exec sed -i 's/exchange.haveno.Haveno/YOUR_ID_HERE/g' {} +
+> find . -type f -exec sed -i 's|http://localhost:8080|your-url-here|g' {} +
 > ```
 >
 > This will also change the string in the README. **Ensure that you have changed the ID and the `bind`ed folder in your Haveno builds too, otherwise users won't be able to install your application.**
@@ -48,10 +48,11 @@ This README provides instructions for setting up a `flat-manager` server for you
 
    Once you see "Started http server", initialize your stable repository (one-time setup):
 
-   ```bash
-   # Enter the 'flat-manager' container with an interactive bash shell
-   docker compose exec -it flat-manager bash
+   Enter the 'flat-manager' container with an interactive bash shell: `docker compose exec -it flat-manager bash`
 
+   Then paste the following:
+
+   ```bash
    # Update package lists and install 'ostree' inside the container
    apt update && apt install -y ostree
 
@@ -83,7 +84,7 @@ This README provides instructions for setting up a `flat-manager` server for you
    > The `sed` commands mentioned earlier does this for you.
    - Monitor the logs to ensure everything proceeds smoothly.
    - If no errors occur, press `y` to confirm and publish the build. Reminder that anything that isn't published doesn't appear in users' repositories, and will be lost if the container is removed.
-   - You're done!
+   - You're done! Just repeat from 1. to build and publish more apps.
 
 ### Testing
 
