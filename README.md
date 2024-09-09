@@ -1,6 +1,6 @@
 # Haveno Sample Build
 
-This README provides instructions for setting up a `flat-manager` server for your Haveno instance Flatpaks using Docker.
+This README provides instructions for setting up a `flat-manager` server for your Haveno instance Flatpaks using Docker. You should clone this repo on the machine you intend to host the repository on.
 
 ## Setup Instructions
 
@@ -19,11 +19,11 @@ This README provides instructions for setting up a `flat-manager` server for you
 
 2. Complete the todos in the project:
    - [ ] **Generate a GPG Key:**
-     Create a GPG key with `./.gpg` as the gpg home directory and store the base64 encoded key in `.flatpakref`. Refer to the [gpgkey.sh](./gpgkey.sh) script for an example.
+     Create a GPG key with `./.gpg` as the gpg home directory. Store the base64 encoded key (long one) in the `.flatpakref`. You can use [gpgkey.sh](./gpgkey.sh), but it's recommended to fill in the information manually.
    - [ ] **Update `config.json`:**
-     Enter the new GPG key ID in `config.json` on lines 8 and 36.
+     Enter the new GPG key ID (short one) in `config.json` on lines 8 and 36.
    - [ ] **Generate and Enter Secret:**
-     Generate a secret and enter it on line 38 of `config.json`. Use the `gentoken` project (taken from the `flat-manager` project) to generate a token:
+     Generate a secret and enter it on line 38 of `config.json`. Then you can run the `gentoken` project (taken from the `flat-manager` project) to generate a token **using the secret you generated**:
 
      ```bash
      cd gentoken
@@ -33,7 +33,7 @@ This README provides instructions for setting up a `flat-manager` server for you
 
      cd -
      ```
-
+      You can generate multiple tokens with different permissions. Refer to the flat-manager docs for more info.
 ### Start Services
 
 1. **Bring Up Docker Containers:**
@@ -69,7 +69,7 @@ This README provides instructions for setting up a `flat-manager` server for you
 ### Build and Publish
 
 1. **Build an App:**
-   Build your application into a temporary repository. For details, refer to the [Flatpak Builder documentation](https://docs.flatpak.org/en/latest/flatpak-builder.html).
+   Build your application into a local repository. This will usually be `./repo` from the build directory, it doesn't need to be in this folder. For details, refer to the [Flatpak Builder documentation](https://docs.flatpak.org/en/latest/flatpak-builder.html).
 
 2. **Set TOKEN_FILE:**
    Set `TOKEN_FILE` to the location of the file containing your token (not the secret), which should be `PROJ_DIR/token.txt`.
@@ -82,9 +82,9 @@ This README provides instructions for setting up a `flat-manager` server for you
 
    - Set `FLATMAN_URL` if you're not using the default localhost URL.
    > The `sed` commands mentioned earlier does this for you.
-   - Monitor the logs to ensure everything proceeds smoothly.
-   - If no errors occur, press `y` to confirm and publish the build. Reminder that anything that isn't published doesn't appear in users' repositories, and will be lost if the container is removed.
-   - You're done! Just repeat from 1. to build and publish more apps.
+   - Monitor the logs to ensure everything proceeds smoothly. You should be able to use `flatpak remote-add <URL>` with the build link it gives you if you'd like to test the build.
+   - If no errors occur, press `y` to confirm and publish the build. Reminder that any builds that aren't published don't appear in the user-visible repo, and will be lost if the container is removed.
+   - You're done! Just repeat from 1. to build and publish later versions.
 
 ### Testing
 
@@ -107,4 +107,7 @@ flatpak run exchange.haveno.Haveno
   The build directory may grow large over time. `ostree` manages size to some extent, but running `docker compose down` and `docker compose up` should clear the cache.
 
 - **Configuration Storage:**
-  All saved configuration, except for `.gpg` and `config.json`, is stored in Docker volumes. Refer to the Docker documentation if you need to edit these volumes.
+  All saved configuration, except for `.gpg` and `config.json`, is stored in Docker volumes. Refer to the Docker documentation if you need to edit these volumes. This is done to ensure other programs can't see secrets, and as such I'd recommend `chmod` and `chown`ing those two so that only root (and docker) can view them. You can also remove `secret.txt`, and `token.txt` if you have stored it somewhere else. 
+
+- **Pushing builds:**
+  If you have a copy of a token and the repo's URL is publicly accessible, you can push builds from a different computer (this is why your secret should be secure!). Simply copy the `publish.sh` script wherever you need it and keep the token somewhere secure in your home directory or in a vault, and you can run it the same as you would from the host computer.
