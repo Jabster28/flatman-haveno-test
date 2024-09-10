@@ -19,7 +19,7 @@ This README provides instructions for setting up a `flat-manager` server for you
 
 2. Complete the todos in the project:
    - [ ] **Generate a GPG Key:**
-     Create a GPG key with `./.gpg` as the gpg home directory. Store the base64 encoded key (long one) in the `.flatpakref`. You can use [gpgkey.sh](./gpgkey.sh), but it's recommended to fill in the information manually.
+     Create a GPG key with `./.gpg` as the gpg home directory. You can use [gpgkey.sh](./gpgkey.sh), but it's recommended to fill in the information manually.
    - [ ] **Update `config.json`:**
      Enter the new GPG key ID (short one) in `config.json` on lines 8 and 36.
    - [ ] **Generate and Enter Secret:**
@@ -82,7 +82,7 @@ This README provides instructions for setting up a `flat-manager` server for you
 
    - Set `FLATMAN_URL` if you're not using the default localhost URL.
    > The `sed` commands mentioned earlier does this for you.
-   - Monitor the logs to ensure everything proceeds smoothly. You should be able to use `flatpak remote-add <URL>` with the build link it gives you if you'd like to test the build.
+   - Monitor the logs to ensure everything proceeds smoothly. You should be able to install the temporary build for testing, but I haven't seen an API endpoint for that yet.
    - If no errors occur, press `y` to confirm and publish the build. Reminder that any builds that aren't published don't appear in the user-visible repo, and will be lost if the container is removed.
    - You're done! Just repeat from 1. to build and publish later versions.
 
@@ -98,7 +98,10 @@ flatpak run exchange.haveno.Haveno
 ## Notes
 
 - **`.flatpakref` File:**
-  Share the `.flatpakref` file to direct users to your app. It acts as a manifest indicating where the app and related data are stored.
+  There's a default `.flatpakref` file in this repo for testing. It acts as a manifest indicating where the app and related data are stored. However, once you have functioning builds, it's better to re-host a copy of the generated file which is at `http://localhost:8080/repo/stable/appstream/exchange.haveno.Haveno.flatpakref`, or better yet ask your users to run the following to install it in one line:
+  ```sh
+  flatpak install --from "http://localhost:8080/repo/stable/appstream/exchange.haveno.Haveno.flatpakref"
+  ```
 
 - **Updates:**
   Instruct users to run `flatpak update exchange.haveno.Haveno` to update the app.
