@@ -9,6 +9,21 @@ NC='\033[0m' # No Color
 # Default FLATMAN_URL
 FLATMAN_URL=${FLATMAN_URL:-http://localhost:8080}
 
+# Check if org.flatpak.flat-manager-client is installed
+if ! flatpak list | grep -q 'org.flatpak.flat-manager-client'; then
+  echo -e "${YELLOW}org.flatpak.flat-manager-client is not installed.${NC}"
+  read -p "$(echo -e ${YELLOW}Do you want to install it for this user? [y/n, default: n]: ${NC})" INSTALL_RESPONSE
+  INSTALL_RESPONSE=${INSTALL_RESPONSE:-n}
+
+  if [ "$INSTALL_RESPONSE" == "y" ]; then
+    echo -e "${YELLOW}Installing org.flatpak.flat-manager-client...${NC}"
+    flatpak install --user -y org.flatpak.flat-manager-client
+  else
+    echo -e "${RED}Installation aborted.${NC}"
+    exit 1
+  fi
+fi
+
 # Check if a directory argument is provided
 if [ -z "$1" ]; then
   echo -e "${RED}Usage: $0 <directory>${NC}"
